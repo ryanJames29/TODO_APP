@@ -2,22 +2,29 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import { router } from "expo-router";
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CryptoJS from "crypto-js";
 
 export default function RegisterScreen() {
+  //state variables to store information when registering user. 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleGoBack = () => router.back(); // Go back to login
+  const handleGoBack = () => router.back(); //Go back to login
 
   const handleSignUp = async () => {
+    //Ensure all fields are filled out
     if(!fullName || !email || !password){
       Alert.alert("Error", "Missing field data.");
       return;
     }
 
     try{
-      const userInformation = {fullName, email, password};
+      //hash the password for security
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+
+      //set the user information, store it in async storage
+      const userInformation = {fullName, email, password: hashedPassword};
       await AsyncStorage.setItem("user", JSON.stringify(userInformation));
 
       Alert.alert("Success", "Account Created!");
