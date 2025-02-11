@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define the Todo type
+//Todo type
 type Todo = {
   id: number;
   text: string;
@@ -14,6 +14,7 @@ export default function TodoScreen() {
   const [newTodo, setNewTodo] = useState("");
 
   useEffect(() => {
+    //need to change this so it is user specific todo items (user.savedTodos).
     const loadTodos = async () => {
       const savedTodos = await AsyncStorage.getItem("todos");
       if (savedTodos) setTodos(JSON.parse(savedTodos));
@@ -21,6 +22,7 @@ export default function TodoScreen() {
     loadTodos();
   }, []);
 
+  //need to add other information, such as prioroty (possibly), but at least sort between completed/incomplete items.
   const addTodo = async () => {
     const updatedTodos: Todo[] = [...todos, { id: Date.now(), text: newTodo, completed: false }];
     setTodos(updatedTodos);

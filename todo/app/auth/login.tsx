@@ -5,21 +5,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CryptoJS from "crypto-js";
 
 export default function LoginScreen() {
+  //states to store the email and passwords of the users.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  /*
+    handleLogin takes the text entry from the form and compares it with
+    the async storage user data
+  */
   const handleLogin = async () => {
     try {
       const getUser = await AsyncStorage.getItem("user");
 
+      //error handling for if the user doesnt exist.
       if (!getUser) {
         Alert.alert("Error", "User does not exist. Please create an account");
         return;
       }
 
+      //parse the user data to get the email and hashed password.
       const userData = JSON.parse(getUser);
       const hashedInputPassword = CryptoJS.SHA256(password).toString();
 
+      //confirm that the email and password are correct. Route accordingly
       if (userData.email === email && userData.password === hashedInputPassword) {
         router.push("/tabs/todo");
       } else {
@@ -31,11 +39,12 @@ export default function LoginScreen() {
     }
   };
 
+  //Routes to register screen
   const handleRegister = () => {
     router.push("/auth/register"); // Navigate to Register screen
   };
 
-  // 🔹 Clear AsyncStorage for development (removes all stored user data)
+  //Clear AsyncStorage for development (removes all stored user data)
   const clearStorage = async () => {
     try {
       await AsyncStorage.clear();
@@ -47,6 +56,7 @@ export default function LoginScreen() {
     }
   };
 
+  //the form displayed on the screen. Sets user information entered on click
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
