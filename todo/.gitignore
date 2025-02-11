@@ -3,24 +3,28 @@
 # dependencies
 node_modules/
 
-# Expo
+# Expo & React Native
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
 
-# Native
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# Native Build Files (iOS & Android)
+android/app/build/
+ios/Pods/
+ios/build/
+ios/*.xcodeproj/
+ios/*.xcworkspace/
+ios/DerivedData/
+ios/.DS_Store
 
 # Metro
 .metro-health-check*
 
 # debug
+*.log
+debug.log
 npm-debug.*
 yarn-debug.*
 yarn-error.*
@@ -35,4 +39,26 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-app-example
+# IDE / Editor-Specific Files
+.vscode/
+.idea/
+*.iml
+
+# Temp & Swap Files
+*.tmp
+*.swp
+
+# Keystore, Credentials & Configs (for security)
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.env
+*.env
+config.js
+config.ts
+google-services.json
+aws-credentials.json
+firebaseConfig.js
+*.keystore

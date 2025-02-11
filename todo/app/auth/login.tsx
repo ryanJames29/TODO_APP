@@ -1,22 +1,69 @@
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router"; // Import router for navigation
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CryptoJS from "crypto-js";
 
 export default function LoginScreen() {
-  const handleLogin = () => {
-    console.log("Login pressed");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const getUser = await AsyncStorage.getItem("user");
+
+      if (!getUser) {
+        Alert.alert("Error", "User does not exist. Please create an account");
+        return;
+      }
+
+      const userData = JSON.parse(getUser);
+      const hashedInputPassword = CryptoJS.SHA256(password).toString();
+
+      if (userData.email === email && userData.password === hashedInputPassword) {
+        router.push("/tabs/todo");
+      } else {
+        Alert.alert("Error", "Incorrect email or password");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      Alert.alert("Error", "Something went wrong.");
+    }
   };
 
   const handleRegister = () => {
     router.push("/auth/register"); // Navigate to Register screen
   };
 
+  // 🔹 Clear AsyncStorage for development (removes all stored user data)
+  const clearStorage = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log("All AsyncStorage data cleared!");
+      Alert.alert("Success", "All user data has been erased!");
+    } catch (error) {
+      console.error("Error clearing AsyncStorage:", error);
+      Alert.alert("Error", "Failed to clear user data.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
 
-      <TextInput placeholder="Email" style={styles.input} />
-      <TextInput placeholder="Password" style={styles.input} secureTextEntry />
+      <TextInput 
+        placeholder="Email" 
+        style={styles.input} 
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput 
+        placeholder="Password" 
+        style={styles.input} 
+        secureTextEntry 
+        value={password}
+        onChangeText={setPassword}
+      />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
@@ -25,6 +72,11 @@ export default function LoginScreen() {
       {/* Link under the button */}
       <TouchableOpacity onPress={handleRegister}>
         <Text style={styles.linkText}>Create Account</Text>
+      </TouchableOpacity>
+
+      {/* 🔹 Clear Storage Button for Development Purposes */}
+      <TouchableOpacity style={styles.clearButton} onPress={clearStorage}>
+        <Text style={styles.clearButtonText}>Clear Storage (Dev)</Text>
       </TouchableOpacity>
     </View>
   );
@@ -72,5 +124,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 15,
     textDecorationLine: "underline",
+  },
+  clearButton: {
+    marginTop: 30,
+    backgroundColor: "red", // Red to indicate it's a destructive action
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "darkred",
+    alignItems: "center",
+    width: "80%",
+  },
+  clearButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
