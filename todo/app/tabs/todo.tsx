@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 
 //Todo type
 type Todo = {
   id: number;
   text: string;
   completed: boolean;
+  status: "incomplete" | "in-progress" | "complete";
   email: string;
+};
+
+//used to sort the status of the todo items, 0 being highest priority (top)
+const sortOrder: Record<Todo["status"], number> = {
+  "incomplete": 0,
+  "in-progress": 1,
+  "complete": 2
 };
 
 //Function to get the logged-in user's email - important since the todos are associated with email as of now.
@@ -70,6 +79,7 @@ const TodoListScreen: React.FC = () => {
       const newItem: Todo = {
         id: Date.now(),
         text: newTodo.trim(),
+        status: "incomplete",
         completed: false,
         email: userEmail,
       };
@@ -87,24 +97,24 @@ const TodoListScreen: React.FC = () => {
     }
   };
 
-  //Toggle task completion
-  const toggleComplete = async (id: number) => {
+  //updates the todo objects status stored in Asynch storage.
+  const updateTodoStatus = async (id: number, newStatus: "incomplete" | "in-progress" | "complete") => {
     try {
       const updatedTodos = todos.map(todo =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        todo.id === id ? { ...todo, status: newStatus } : todo
       );
       setTodos(updatedTodos);
-
+  
       const allTodos = await fetchTodos();
       const updatedAllTodos = allTodos.map(todo =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        todo.id === id ? { ...todo, status: newStatus } : todo
       );
-
+  
       await AsyncStorage.setItem("todos", JSON.stringify(updatedAllTodos));
     } catch (error) {
-      console.error("Error updating todo:", error);
+      console.error("Error updating todo status:", error);
     }
-  };
+  };    
 
   //Delete a task
   const deleteTodo = async (id: number) => {
@@ -136,19 +146,37 @@ const TodoListScreen: React.FC = () => {
       <Button title="Add" onPress={addTodo} />
 
       <FlatList
-        data={todos}
+        data={[...todos].sort((a, b) => sortOrder[a.status] - sortOrder[b.status])}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item }) => (
           <View style={styles.todoContainer}>
-            <TouchableOpacity 
-              onPress={() => toggleComplete(item.id)} 
-              style={styles.todoTextContainer}
-            >
-              <Text style={[styles.todoText, item.completed && styles.completed]}>
-                {item.text}
-              </Text>
-            </TouchableOpacity>
+            {/* Task Name on the Left */}
+            <Text style={styles.todoText}>{item.text}</Text>
+
+            {/* Status Selection on the Right */}
+            <View style={styles.statusContainer}>
+              {/* When the emoji is selected, it updates the status and stores it */}
+              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "incomplete")}>
+                <Text style={[styles.statusIcon, item.status === "incomplete" ? styles.selected : styles.unselected]}>
+                  ❌
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "in-progress")}>
+                <Text style={[styles.statusIcon, item.status === "in-progress" ? styles.selected : styles.unselected]}>
+                  🔄
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "complete")}>
+                <Text style={[styles.statusIcon, item.status === "complete" ? styles.selected : styles.unselected]}>
+                  ✔️
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Delete Button - May want to change this with the addition of the ❌ */}
             <TouchableOpacity onPress={() => deleteTodo(item.id)} style={styles.deleteButton}>
               <Text style={styles.deleteText}>✕</Text>
             </TouchableOpacity>
@@ -162,7 +190,7 @@ const TodoListScreen: React.FC = () => {
 //UI Styles
 const styles = StyleSheet.create({
   container: { 
-    flex: 1,  // ✅ Ensures it fills the entire screen
+    flex: 1,  
     paddingLeft: 30, 
     paddingRight: 30,
     backgroundColor: "white",
@@ -172,7 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 20, 
     marginTop: 50,
     fontWeight: "bold", 
-    textAlign: "center" 
+    textAlign: "center",
   },
   input: { 
     width: "100%", 
@@ -184,29 +212,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   todoContainer: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    // padding: 10, 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10, 
     borderBottomWidth: 1,
-  },
-  todoTextContainer: { 
-    flex: 1,
+    borderBottomColor: "gray",
   },
   todoText: { 
-    fontSize: 18 
+    fontSize: 18,
+    color: "black",
+    flex: 1,
   },
-  completed: { 
-    textDecorationLine: "line-through", 
-    color: "gray" 
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusIcon: { 
+    fontSize: 24,
+    marginHorizontal: 8,
+  },
+  selected: {
+    opacity: 1,
+  },
+  unselected: {
+    opacity: 0.1,
   },
   deleteButton: { 
-    padding: 5 
+    padding: 10, 
+    marginLeft: 10,
   },
   deleteText: { 
     fontSize: 20, 
-    color: "red" 
+    color: "red",
   },
-});
+});  
 
 export default TodoListScreen;
