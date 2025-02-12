@@ -5,59 +5,71 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CryptoJS from "crypto-js";
 
 export default function RegisterScreen() {
-  //state variables to store information when registering user. 
+  //State variables to store user registration input.
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleGoBack = () => router.back(); //Go back to login
+  const handleGoBack = () => router.back();
 
   const handleSignUp = async () => {
-    //Ensure all fields are filled out
-    if(!fullName || !email || !password){
-      Alert.alert("Error", "Missing field data.");
+    if (!fullName || !email || !password) {
+      Alert.alert("Error", "All fields are required.");
       return;
     }
 
-    try{
-      //hash the password for security
+    try {
+      //Hash the password for security
       const hashedPassword = CryptoJS.SHA256(password).toString();
+      const newUser = { fullName, email, password: hashedPassword };
 
-      //set the user information, store it in async storage
-      const userInformation = {fullName, email, password: hashedPassword};
-      await AsyncStorage.setItem("user", JSON.stringify(userInformation));
+      //Retrieve existing users
+      const existingUsers = await AsyncStorage.getItem("users");
+      const usersArray = existingUsers ? JSON.parse(existingUsers) : [];
+
+      //Check if email already exists
+      const userExists = usersArray.some(user => user.email === email);
+      if (userExists) {
+        Alert.alert("Error", "An account with this email already exists.");
+        return;
+      }
+
+      //Add new user to the array and save back to AsyncStorage
+      usersArray.push(newUser);
+      await AsyncStorage.setItem("users", JSON.stringify(usersArray));
 
       Alert.alert("Success", "Account Created!");
       router.push("/");
+
     } catch (error) {
-      console.error("Error saving the user data:", error);
-      Alert.alert("Error", "An Error Occurred during account creation");
+      console.error("Error saving user data:", error);
+      Alert.alert("Error", "An error occurred during account creation.");
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
-      <TextInput 
-        placeholder="Full Name" 
-        style={styles.input} 
+      <TextInput
+        placeholder="Full Name"
+        style={styles.input}
         placeholderTextColor="#333"
         value={fullName}
         onChangeText={setFullName}
       />
-      <TextInput 
-        placeholder="Email" 
-        style={styles.input} 
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
         placeholderTextColor="#333"
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput 
-        placeholder="Password" 
-        style={styles.input} 
-        placeholderTextColor="#333" 
-        secureTextEntry 
+      <TextInput
+        placeholder="Password"
+        style={styles.input}
+        placeholderTextColor="#333"
+        secureTextEntry
         value={password}
         onChangeText={setPassword}
       />

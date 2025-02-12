@@ -3,45 +3,60 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import { router } from "expo-router"; // Import router for navigation
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CryptoJS from "crypto-js";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../App";  // ✅ Import RootStackParamList
 
 export default function LoginScreen() {
   //states to store the email and passwords of the users.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  /*
-    handleLogin takes the text entry from the form and compares it with
-    the async storage user data
-  */
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  //handleLogin takes the text entry from the form and compares it with the async storage user data
   const handleLogin = async () => {
     try {
-      const getUser = await AsyncStorage.getItem("user");
+      // FOR DEV PURPOSES. SHOWS AVAILABLE ROUTES IF HAVING ROUTING ISSUES
+      console.log("Available Routes:", navigation.getState());
 
-      //error handling for if the user doesnt exist.
-      if (!getUser) {
-        Alert.alert("Error", "User does not exist. Please create an account");
+      const users = await AsyncStorage.getItem("users"); // ✅ Retrieve all stored users
+      if (!users) {
+        Alert.alert("Error", "No registered users found.");
         return;
       }
 
-      //parse the user data to get the email and hashed password.
-      const userData = JSON.parse(getUser);
-      const hashedInputPassword = CryptoJS.SHA256(password).toString();
+      const usersArray = JSON.parse(users);
+      const foundUser = usersArray.find(user => user.email === email);
 
-      //confirm that the email and password are correct. Route accordingly
-      if (userData.email === email && userData.password === hashedInputPassword) {
-        router.push("/tabs/todo");
-      } else {
-        Alert.alert("Error", "Incorrect email or password");
+      if (!foundUser) {
+        Alert.alert("Error", "User not found.");
+        return;
       }
+
+      const hashedInputPassword = CryptoJS.SHA256(password).toString();
+      if (foundUser.password !== hashedInputPassword) {
+        Alert.alert("Error", "Incorrect password.");
+        return;
+      }
+
+      //Both are used to populate the profile screen with the user information
+      await AsyncStorage.setItem("loggedInUserEmail", foundUser.email);
+      await AsyncStorage.setItem("loggedInUser_name", foundUser.fullName);
+      console.log("Logged in user:", foundUser);
+
+      //Navigate to the main app screen
+      navigation.navigate("tabs/todoNav");
+
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error during login:", error);
       Alert.alert("Error", "Something went wrong.");
     }
   };
 
-  //Routes to register screen
+  //Routes to register screen => May need to change to navigate instead
   const handleRegister = () => {
-    router.push("/auth/register"); // Navigate to Register screen
+    router.push("/auth/register");
   };
 
   //Clear AsyncStorage for development (removes all stored user data)
@@ -56,7 +71,7 @@ export default function LoginScreen() {
     }
   };
 
-  //the form displayed on the screen. Sets user information entered on click
+  //The form displayed on the screen. Sets user information entered on click
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -84,7 +99,7 @@ export default function LoginScreen() {
         <Text style={styles.linkText}>Create Account</Text>
       </TouchableOpacity>
 
-      {/* 🔹 Clear Storage Button for Development Purposes */}
+      {/* Clear Storage Button for Development Purposes */}
       <TouchableOpacity style={styles.clearButton} onPress={clearStorage}>
         <Text style={styles.clearButtonText}>Clear Storage (Dev)</Text>
       </TouchableOpacity>
