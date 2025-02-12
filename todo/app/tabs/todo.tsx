@@ -128,6 +128,7 @@ const TodoListScreen: React.FC = () => {
       <TextInput
         placeholder="New Task"
         style={styles.input}
+        placeholderTextColor="black"
         value={newTodo}
         onChangeText={setNewTodo}
       />
@@ -137,6 +138,7 @@ const TodoListScreen: React.FC = () => {
       <FlatList
         data={todos}
         keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item }) => (
           <View style={styles.todoContainer}>
             <TouchableOpacity 
@@ -160,13 +162,15 @@ const TodoListScreen: React.FC = () => {
 //UI Styles
 const styles = StyleSheet.create({
   container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: "white" 
-  },
+    flex: 1,  // ✅ Ensures it fills the entire screen
+    paddingLeft: 30, 
+    paddingRight: 30,
+    backgroundColor: "white",
+  },  
   title: { 
     fontSize: 24, 
     marginBottom: 20, 
+    marginTop: 50,
     fontWeight: "bold", 
     textAlign: "center" 
   },
@@ -175,17 +179,19 @@ const styles = StyleSheet.create({
     padding: 10, 
     marginBottom: 10, 
     borderWidth: 1, 
-    borderRadius: 5 
+    borderRadius: 5,
+    color: "black",
+    fontSize: 16,
   },
   todoContainer: { 
     flexDirection: "row", 
     alignItems: "center", 
     justifyContent: "space-between", 
-    padding: 10, 
-    borderBottomWidth: 1 
+    // padding: 10, 
+    borderBottomWidth: 1,
   },
   todoTextContainer: { 
-    flex: 1 
+    flex: 1,
   },
   todoText: { 
     fontSize: 18 

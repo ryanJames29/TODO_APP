@@ -88,14 +88,15 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
   },
   title: {
     fontSize: 24,
+    color: "black",
+    marginBottom: 50,
     fontWeight: "bold",
-    marginBottom: 25,
+    paddingTop: 50,
   },
   input: {
     width: "80%",
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 25,
   },
   button: {
     backgroundColor: "#007BFF",
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "80%",
     alignItems: "center",
+    marginTop: 25,
   },
   buttonText: {
     color: "white",
@@ -121,5 +123,6 @@ const styles = StyleSheet.create({
     color: "#007BFF",
     marginTop: 15,
     textDecorationLine: "underline",
+    fontSize: 16,
   },
 });
