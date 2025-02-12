@@ -31,9 +31,18 @@ const TodoNav: React.FC = () => {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: "blue",
+          tabBarActiveTintColor: "black",
           tabBarInactiveTintColor: "gray",
-          tabBarStyle: { backgroundColor: "#f8f8f8", paddingBottom: 5 },
+          tabBarStyle: {
+            backgroundColor: "white",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 60,
+            borderTopWidth: 0,
+            elevation: 0,
+          },
           headerShown: false, // Hide header to make more space
         })}
       >

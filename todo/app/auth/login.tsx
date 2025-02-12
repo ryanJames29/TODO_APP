@@ -94,31 +94,32 @@ export default function LoginScreen() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      {/* Link under the button */}
-      <TouchableOpacity onPress={handleRegister}>
-        <Text style={styles.linkText}>Create Account</Text>
-      </TouchableOpacity>
-
       {/* Clear Storage Button for Development Purposes */}
       <TouchableOpacity style={styles.clearButton} onPress={clearStorage}>
         <Text style={styles.clearButtonText}>Clear Storage (Dev)</Text>
       </TouchableOpacity>
+
+      {/* Link under the button */}
+      <TouchableOpacity onPress={handleRegister}>
+        <Text style={styles.linkText}>Create Account</Text>
+      </TouchableOpacity>
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 4,
-    justifyContent: "center",
+    flex: 1,
     alignItems: "center",
     backgroundColor: "white",
   },
   title: {
     fontSize: 24,
     color: "black",
-    marginBottom: 25,
+    marginBottom: 50,
     fontWeight: "bold",
+    paddingTop: 50,
   },
   input: {
     width: "80%",
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 25,
   },
   button: {
     backgroundColor: "#007BFF",
@@ -137,6 +138,7 @@ const styles = StyleSheet.create({
     borderColor: "#0056b3",
     alignItems: "center",
     width: "80%",
+    marginTop: 25,
   },
   buttonText: {
     color: "white",
