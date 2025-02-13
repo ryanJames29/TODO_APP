@@ -191,7 +191,7 @@ const TodoListScreen: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item }) => (
           <View style={styles.todoContainer}>
-            <Text style={styles.todoText}>{item.text} ({item.category})</Text>
+            <Text style={styles.todoText}> ({item.category}) {item.text}</Text>
 
             {/* Status Selection on the Right */}
             <View style={styles.statusContainer}>
