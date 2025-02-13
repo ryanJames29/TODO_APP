@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { router } from "expo-router"; // Import router for navigation
+import { router } from "expo-router";
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
 
-  // ✅ Fetch the user's email for display
+  // Fetch the user's email for display
   useEffect(() => {
     const fetchUserEmail = async () => {
       const storedEmail = await AsyncStorage.getItem("loggedInUserEmail");
@@ -18,7 +18,7 @@ const ProfileScreen: React.FC = () => {
     fetchUserEmail();
   }, []);
 
-  // ✅ Fetch the user's name for display
+  // Fetch the user's name for display
   useEffect(() => {
     const fetchName = async () => {
       const storedName = await AsyncStorage.getItem("loggedInUser_name");
@@ -27,7 +27,7 @@ const ProfileScreen: React.FC = () => {
     fetchName();
   }, []);
 
-  // ✅ Handle Logout
+  // Handle Logout
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("loggedInUserEmail");
@@ -41,12 +41,12 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* ✅ "Profile" title centered at the top */}
+      {/* Profile title centered at the top */}
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
       </View>
 
-      {/* ✅ User Info (Left-aligned) */}
+      {/* User Info (Left-aligned) */}
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Email:</Text>
         <Text style={styles.text}>{email}</Text>
@@ -55,7 +55,7 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.text}>{name}</Text>
       </View>
 
-      {/* ✅ Logout Button at the Bottom */}
+      {/* Logout Button at the Bottom */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
@@ -69,15 +69,16 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: "white",
-    justifyContent: "space-between", // ✅ Ensures Profile at top & Logout at bottom
+    justifyContent: "space-between",
   },
   header: {
     alignItems: "center",
-    marginTop: 50, // ✅ Pushes "Profile" down slightly for better positioning
+    marginTop: 50,
   },
   title: { 
-    fontSize: 24, 
+    fontSize: 35, 
     fontWeight: "bold",
+    fontFamily: "Courier New"
   },
   infoContainer: { 
     marginTop: 50,
@@ -85,19 +86,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   label: { 
-    fontSize: 20, 
+    fontSize: 25, 
     fontWeight: "bold", 
     color: "black",
     marginBottom: 5,
+    fontFamily: "Courier New",
   },
   text: { 
     fontSize: 18, 
     color: "black",
-    marginBottom: 20, // ✅ Adds spacing between Name & Email
+    marginBottom: 20,
+    fontFamily: "Courier New",
+    fontWeight: "bold"
   },
   footer: {
     alignItems: "center", 
-    paddingBottom: 100, // ✅ Ensures Logout button is at bottom
+    paddingBottom: 100,
   },
   logoutButton: { 
     backgroundColor: "red",
@@ -110,9 +114,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButtonText: { 
-    fontSize: 18, 
+    fontSize: 20, 
     color: "white", 
     fontWeight: "bold",
+    fontFamily: "Courier New"
   },
 });
 

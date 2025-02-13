@@ -189,6 +189,10 @@ const TodoListScreen: React.FC = () => {
 
 //UI Styles
 const styles = StyleSheet.create({
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "black",
+  },
   container: { 
     flex: 1,  
     paddingLeft: 30, 
@@ -196,11 +200,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },  
   title: { 
-    fontSize: 24, 
+    fontSize: 35, 
     marginBottom: 20, 
     marginTop: 50,
     fontWeight: "bold", 
     textAlign: "center",
+    fontFamily: "Courier New"
   },
   input: { 
     width: "100%", 
@@ -210,6 +215,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: "black",
     fontSize: 16,
+    fontFamily: "Courier New",
+    fontWeight: "bold"
   },
   todoContainer: { 
     flexDirection: "row",
@@ -223,6 +230,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "black",
     flex: 1,
+    fontFamily: "Courier New",
+    fontWeight: "bold"
   },
   statusContainer: {
     flexDirection: "row",
@@ -243,7 +252,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   deleteText: { 
-    fontSize: 20, 
+    fontSize: 25, 
     color: "red",
   },
 });  
