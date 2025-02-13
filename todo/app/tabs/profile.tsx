@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 35, 
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   infoContainer: { 
     marginTop: 50,
@@ -90,13 +90,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold", 
     color: "black",
     marginBottom: 5,
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
   },
   text: { 
     fontSize: 18, 
     color: "black",
     marginBottom: 20,
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
     fontWeight: "bold"
   },
   footer: {
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 20, 
     color: "white", 
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
 });
 
