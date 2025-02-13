@@ -1,14 +1,17 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { router } from "expo-router";
 import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, StatusBar, KeyboardAvoidingView, Platform, Image, ImageBackground } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CryptoJS from "crypto-js";
 
-export default function RegisterScreen() {
+const RegisterScreen = () => {
   //State variables to store user registration input.
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const insets = useSafeAreaInsets();
 
   const handleGoBack = () => router.back();
 
@@ -28,13 +31,12 @@ export default function RegisterScreen() {
       const usersArray = existingUsers ? JSON.parse(existingUsers) : [];
 
       //Check if email already exists
-      const userExists = usersArray.some(user => user.email === email);
-      if (userExists) {
+      if (usersArray.some(user => user.email === email)) {
         Alert.alert("Error", "An account with this email already exists.");
         return;
       }
 
-      //Add new user to the array and save back to AsyncStorage
+      //Add new user and save to AsyncStorage
       usersArray.push(newUser);
       await AsyncStorage.setItem("users", JSON.stringify(usersArray));
 
@@ -48,81 +50,127 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
+    <ImageBackground
+          source={require("../../components/ui/8573.jpg")}
+          style={styles.background}
+          resizeMode="cover"
+    >
+      <StatusBar barStyle="light-content" translucent backgroundColor="black" />
+      <SafeAreaView style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardView}
+        >
+          <View style={styles.container}>
+            <Image source={require("../../components/ui/icon.png")} style={styles.icon} resizeMode="contain" />
+            <Text style={styles.header}>To-Do App</Text>
+            <Text style={styles.title}>Create Account</Text>
 
-      <TextInput
-        placeholder="Full Name"
-        style={styles.input}
-        placeholderTextColor="#333"
-        value={fullName}
-        onChangeText={setFullName}
-      />
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        placeholderTextColor="#333"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        placeholderTextColor="#333"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+            <TextInput
+              placeholder="Full Name"
+              placeholderTextColor="#aaa"
+              style={styles.input}
+              value={fullName}
+              onChangeText={setFullName}
+            />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#aaa"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#aaa"
+              style={styles.input}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleGoBack}>
-        <Text style={styles.linkText}>Back to Login</Text>
-      </TouchableOpacity>
-    </View>
+            <TouchableOpacity onPress={handleGoBack}>
+              <Text style={styles.linkText}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "black",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "white",
+  },
+  header: {
+    fontSize: 35,
+    color: "white",
+    marginBottom: 20,
+    fontWeight: "bold",
+    fontFamily: "Courier New"
   },
   title: {
     fontSize: 24,
-    color: "black",
-    marginBottom: 50,
+    color: "white",
+    marginBottom: 40,
     fontWeight: "bold",
-    paddingTop: 50,
+    fontFamily: "Courier New"
   },
   input: {
     width: "80%",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#555",
+    borderRadius: 10,
     marginBottom: 25,
+    color: "white",
+    backgroundColor: "#222",
+    fontFamily: "Courier New",
+    fontWeight: "bold"
   },
   button: {
     backgroundColor: "#007BFF",
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 8,
     width: "80%",
     alignItems: "center",
     marginTop: 25,
+    marginBottom: 25
   },
   buttonText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
+    fontFamily: "Courier New"
   },
   linkText: {
     color: "#007BFF",
     marginTop: 15,
-    textDecorationLine: "underline",
     fontSize: 16,
+    fontWeight: "bold",
+    fontFamily: "Courier New"
+  },
+  icon: {
+    width: 120,
+    height: 120,
+    marginBottom: 40,
   },
 });
+
+export default RegisterScreen;
