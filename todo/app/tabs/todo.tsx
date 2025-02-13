@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
 
 //Todo type
 type Todo = {
@@ -10,6 +9,7 @@ type Todo = {
   completed: boolean;
   status: "incomplete" | "in-progress" | "complete";
   email: string;
+  category: "school" | "work" | "personal";
 };
 
 //used to sort the status of the todo items, 0 being highest priority (top)
@@ -19,7 +19,7 @@ const sortOrder: Record<Todo["status"], number> = {
   "complete": 2
 };
 
-//Function to get the logged-in user's email - important since the todos are associated with email as of now.
+//Function to get the logged-in user's email
 const getUserEmail = async (): Promise<string | null> => {
   try {
     const email = await AsyncStorage.getItem("loggedInUserEmail");
@@ -52,6 +52,10 @@ const getUserTodos = async (): Promise<Todo[]> => {
 const TodoListScreen: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
+  const [name, setName] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<"school" | "work" | "personal">("personal");
+
+  const categories: Array<"school" | "work" | "personal"> = ["school", "work", "personal"];
 
   //Load todos on mount
   useEffect(() => {
@@ -82,6 +86,7 @@ const TodoListScreen: React.FC = () => {
         status: "incomplete",
         completed: false,
         email: userEmail,
+        category: selectedCategory,
       };
 
       const updatedTodos = [...todos, newItem];
@@ -104,17 +109,17 @@ const TodoListScreen: React.FC = () => {
         todo.id === id ? { ...todo, status: newStatus } : todo
       );
       setTodos(updatedTodos);
-  
+
       const allTodos = await fetchTodos();
       const updatedAllTodos = allTodos.map(todo =>
         todo.id === id ? { ...todo, status: newStatus } : todo
       );
-  
+
       await AsyncStorage.setItem("todos", JSON.stringify(updatedAllTodos));
     } catch (error) {
       console.error("Error updating todo status:", error);
     }
-  };    
+  };
 
   //Delete a task
   const deleteTodo = async (id: number) => {
@@ -131,9 +136,17 @@ const TodoListScreen: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchName = async () => {
+      const storedName = await AsyncStorage.getItem("loggedInUser_name");
+      setName(storedName);
+    };
+    fetchName();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>To-Do List</Text>
+      <Text style={styles.title}>{name}'s To-Do List</Text>
 
       <TextInput
         placeholder="New Task"
@@ -143,16 +156,42 @@ const TodoListScreen: React.FC = () => {
         onChangeText={setNewTodo}
       />
 
-      <Button title="Add" onPress={addTodo} />
+      <View style={styles.categoryContainer}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category ? styles.categorySelected : styles.categoryUnselected
+            ]}
+            onPress={() => setSelectedCategory(category)}
+          >
+            <Text style={styles.categoryText}>{category.toUpperCase()}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* <Button title="Add" onPress={addTodo} /> */}
+      <TouchableOpacity style={styles.addButton} onPress={addTodo}>
+        <Text style={styles.addButtonText}>Add</Text>
+      </TouchableOpacity>
+
 
       <FlatList
-        data={[...todos].sort((a, b) => sortOrder[a.status] - sortOrder[b.status])}
+        data={[...todos].sort((a, b) => {
+          //First, sort by category
+          if (a.category !== b.category) {
+            return a.category.localeCompare(b.category);
+          }
+          //Second, sort by status within each category
+          return sortOrder[a.status] - sortOrder[b.status];
+        })}
+        
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item }) => (
           <View style={styles.todoContainer}>
-            {/* Task Name on the Left */}
-            <Text style={styles.todoText}>{item.text}</Text>
+            <Text style={styles.todoText}>{item.text} ({item.category})</Text>
 
             {/* Status Selection on the Right */}
             <View style={styles.statusContainer}>
@@ -178,7 +217,7 @@ const TodoListScreen: React.FC = () => {
 
             {/* Delete Button - May want to change this with the addition of the ❌ */}
             <TouchableOpacity onPress={() => deleteTodo(item.id)} style={styles.deleteButton}>
-              <Text style={styles.deleteText}>✕</Text>
+              <Text style={styles.deleteText}>Delete</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -197,6 +236,7 @@ const styles = StyleSheet.create({
     flex: 1,  
     paddingLeft: 30, 
     paddingRight: 30,
+    paddingBottom: 80,
     backgroundColor: "white",
   },  
   title: { 
@@ -205,7 +245,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontWeight: "bold", 
     textAlign: "center",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   input: { 
     width: "100%", 
@@ -214,47 +254,100 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderRadius: 5,
     color: "black",
-    fontSize: 16,
-    fontFamily: "Courier New",
+    fontSize: 18,
+    fontFamily: "Courier",
     fontWeight: "bold"
   },
-  todoContainer: { 
+  categoryContainer: {  
     flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 15,
+  },
+  categoryButton: {  
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    minWidth: 80,
     alignItems: "center",
-    justifyContent: "space-between",
+  },
+  categorySelected: {  
+    backgroundColor: "#007AFF",
+  },
+  categoryUnselected: {  
+    backgroundColor: "#E0E0E0",
+  },
+  categoryText: {  
+    color: "white",
+    fontWeight: "bold",
+    fontFamily: "Courier",
+    fontSize: 18
+  },
+  todoContainer: { 
     paddingVertical: 10, 
-    borderBottomWidth: 1,
-    borderBottomColor: "gray",
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 10,
+    marginBottom: 10,
+    backgroundColor: "#f9f9f9",
   },
   todoText: { 
     fontSize: 18,
     color: "black",
-    flex: 1,
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
     fontWeight: "bold"
   },
   statusContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 10,
   },
   statusIcon: { 
     fontSize: 24,
-    marginHorizontal: 8,
+    padding: 5,
+    borderRadius: 5, 
+    textAlign: "center",
   },
   selected: {
     opacity: 1,
   },
   unselected: {
-    opacity: 0.1,
+    opacity: 0.3,
   },
-  deleteButton: { 
-    padding: 10, 
-    marginLeft: 10,
+  deleteButton: {  
+    padding: 10,  
+    borderRadius: 8,
+    alignItems: "center",  
+    backgroundColor: "red",  
+    marginTop: 10,
   },
-  deleteText: { 
-    fontSize: 25, 
-    color: "red",
+  deleteText: {  
+    fontSize: 18,  
+    color: "white",  
+    fontWeight: "bold",  
+    fontFamily: "Courier",
   },
-});  
+  addButton: {
+    paddingVertical: 12,  
+    paddingHorizontal: 20,  
+    borderRadius: 8,
+    alignItems: "center",  
+    justifyContent: "center",  
+    backgroundColor: "#007AFF",
+    marginBottom: 10, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  addButtonText: {  
+    fontSize: 18,  
+    fontWeight: "bold",  
+    color: "white",  
+    textTransform: "uppercase",
+    fontFamily: "Courier",
+  },  
+});
 
 export default TodoListScreen;

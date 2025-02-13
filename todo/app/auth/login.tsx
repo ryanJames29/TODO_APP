@@ -20,6 +20,7 @@ const LoginScreen = () => {
   //handleLogin takes the text entry from the form and compares it with the async storage user data
   const handleLogin = async () => {
     try {
+      const lowerCaseEmail = email.toLowerCase();
       // FOR DEV PURPOSES. SHOWS AVAILABLE ROUTES IF HAVING ROUTING ISSUES
       console.log("Available Routes:", navigation.getState());
 
@@ -30,7 +31,7 @@ const LoginScreen = () => {
       }
 
       const usersArray = JSON.parse(users);
-      const foundUser = usersArray.find(user => user.email === email);
+      const foundUser = usersArray.find(user => user.email.toLowerCase() === lowerCaseEmail);
 
       if (!foundUser) {
         Alert.alert("Error", "User not found.");
@@ -44,8 +45,8 @@ const LoginScreen = () => {
       }
 
       //Both are used to populate the profile screen with the user information
-      await AsyncStorage.setItem("loggedInUserEmail", foundUser.email);
-      await AsyncStorage.setItem("loggedInUser_name", foundUser.fullName);
+      await AsyncStorage.setItem("loggedInUserEmail", foundUser.email.toLowerCase());
+      await AsyncStorage.setItem("loggedInUser_name", foundUser.fullName.toUpperCase());
       console.log("Logged in user:", foundUser);
 
       //Navigate to the main app screen
@@ -65,14 +66,22 @@ const LoginScreen = () => {
   //Clear AsyncStorage for development (removes all stored user data)
   const clearStorage = async () => {
     try {
-      await AsyncStorage.clear();
-      console.log("All AsyncStorage data cleared!");
-      Alert.alert("Success", "All user data has been erased!");
+      console.log("Clearing AsyncStorage...");  // Debugging line
+  
+      await AsyncStorage.getAllKeys().then(async (keys) => {
+        if (keys.length) {
+          await AsyncStorage.multiRemove(keys);
+          console.log("Storage cleared!");
+          Alert.alert("Success", "All user data has been erased!");
+        } else {
+          Alert.alert("Info", "No data to clear.");
+        }
+      });
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
       Alert.alert("Error", "Failed to clear user data.");
     }
-  };
+  };  
 
   //The form displayed on the screen. Sets user information entered on click
   return (
@@ -148,14 +157,14 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   title: {
     fontSize: 24,
     color: "white",
     marginBottom: 40,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   input: {
     width: "80%",
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     color: "white",
     backgroundColor: "#222",
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
     fontWeight: "bold"
   },
   button: {
@@ -186,14 +195,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   linkText: {
     color: "#007BFF",
-    fontSize: 16,
+    fontSize: 18,
     marginTop: 15,
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
     fontWeight: "bold",
+    textDecorationLine: "underline"
   },
   clearButton: {
     marginTop: 30,

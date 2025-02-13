@@ -23,15 +23,16 @@ const RegisterScreen = () => {
 
     try {
       //Hash the password for security
+      const lowerCaseEmail = email.toLowerCase();
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      const newUser = { fullName, email, password: hashedPassword };
+      const newUser = { fullName: fullName.toUpperCase(), email: email.toLowerCase(), password: hashedPassword };
 
       //Retrieve existing users
       const existingUsers = await AsyncStorage.getItem("users");
       const usersArray = existingUsers ? JSON.parse(existingUsers) : [];
 
       //Check if email already exists
-      if (usersArray.some(user => user.email === email)) {
+      if (usersArray.some(user => user.email.toLowerCase() === lowerCaseEmail)) {
         Alert.alert("Error", "An account with this email already exists.");
         return;
       }
@@ -94,7 +95,7 @@ const RegisterScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleGoBack}>
-              <Text style={styles.linkText}>Back to Login</Text>
+              <Text style={styles.linkText}>Login</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -123,14 +124,14 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   title: {
     fontSize: 24,
     color: "white",
     marginBottom: 40,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   input: {
     width: "80%",
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     color: "white",
     backgroundColor: "#222",
-    fontFamily: "Courier New",
+    fontFamily: "Courier",
     fontWeight: "bold"
   },
   button: {
@@ -157,14 +158,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier"
   },
   linkText: {
     color: "#007BFF",
     marginTop: 15,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    fontFamily: "Courier New"
+    fontFamily: "Courier",
+    textDecorationLine: "underline"
   },
   icon: {
     width: 120,
