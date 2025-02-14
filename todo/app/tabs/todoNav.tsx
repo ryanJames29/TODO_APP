@@ -31,7 +31,7 @@ const TodoNav: React.FC = () => {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: "black",
+          tabBarActiveTintColor: "#007AFF",
           tabBarInactiveTintColor: "gray",
           tabBarStyle: {
             backgroundColor: "white",

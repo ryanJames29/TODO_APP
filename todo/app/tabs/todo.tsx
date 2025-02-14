@@ -144,6 +144,18 @@ const TodoListScreen: React.FC = () => {
     fetchName();
   }, []);
 
+  const groupedTodos = todos.reduce((acc, todo) => {
+    if (!acc[todo.category]) {
+      acc[todo.category] = [];
+    }
+    acc[todo.category].push(todo);
+    return acc;
+  }, {} as Record<string, Todo[]>);
+
+  Object.keys(groupedTodos).forEach((category) => {
+    groupedTodos[category].sort((a, b) => sortOrder[a.status] - sortOrder[b.status]);
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{name}'s To-Do List</Text>
@@ -176,49 +188,48 @@ const TodoListScreen: React.FC = () => {
         <Text style={styles.addButtonText}>Add</Text>
       </TouchableOpacity>
 
-
       <FlatList
-        data={[...todos].sort((a, b) => {
-          //First, sort by category
-          if (a.category !== b.category) {
-            return a.category.localeCompare(b.category);
-          }
-          //Second, sort by status within each category
-          return sortOrder[a.status] - sortOrder[b.status];
-        })}
-        
-        keyExtractor={(item) => item.id.toString()}
+        data={Object.keys(groupedTodos)}
+        keyExtractor={(category) => category}
         contentContainerStyle={{ flexGrow: 1 }}
-        renderItem={({ item }) => (
-          <View style={styles.todoContainer}>
-            <Text style={styles.todoText}>({item.category}) {item.text}</Text>
+        renderItem={({ item: category }) => (
+          <View>
+            <Text style={styles.categoryHeader}>
+              *** {category.toUpperCase()} ***
+            </Text>
 
-            {/* Status Selection on the Right */}
-            <View style={styles.statusContainer}>
-              {/* When the emoji is selected, it updates the status and stores it */}
-              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "incomplete")}>
-                <Text style={[styles.statusIcon, item.status === "incomplete" ? styles.selected : styles.unselected]}>
-                  ❌
-                </Text>
-              </TouchableOpacity>
+            {groupedTodos[category].map((todo) => (
+              <View key={todo.id} style={styles.todoContainer}>
+                <Text style={styles.todoText}>{todo.text}</Text>
 
-              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "in-progress")}>
-                <Text style={[styles.statusIcon, item.status === "in-progress" ? styles.selected : styles.unselected]}>
-                  🔄
-                </Text>
-              </TouchableOpacity>
+                {/* Status Selection */}
+                <View style={styles.statusContainer}>
+                  <TouchableOpacity onPress={() => updateTodoStatus(todo.id, "incomplete")}>
+                    <Text style={[styles.statusIcon, todo.status === "incomplete" ? styles.selected : styles.unselected]}>
+                      ❌
+                    </Text>
+                  </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => updateTodoStatus(item.id, "complete")}>
-                <Text style={[styles.statusIcon, item.status === "complete" ? styles.selected : styles.unselected]}>
-                  ✔️
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <TouchableOpacity onPress={() => updateTodoStatus(todo.id, "in-progress")}>
+                    <Text style={[styles.statusIcon, todo.status === "in-progress" ? styles.selected : styles.unselected]}>
+                      🔄
+                    </Text>
+                  </TouchableOpacity>
 
-            {/* Delete Button - May want to change this with the addition of the ❌ */}
-            <TouchableOpacity onPress={() => deleteTodo(item.id)} style={styles.deleteButton}>
-              <Text style={styles.deleteText}>Delete</Text>
-            </TouchableOpacity>
+                  <TouchableOpacity onPress={() => updateTodoStatus(todo.id, "complete")}>
+                    <Text style={[styles.statusIcon, todo.status === "complete" ? styles.selected : styles.unselected]}>
+                      ✔️
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity onPress={() => deleteTodo(todo.id)} style={styles.deleteButton}>
+                  <Text style={styles.deleteText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+
+            <View style={styles.separator} />
           </View>
         )}
       />
@@ -348,6 +359,18 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     fontFamily: "Courier",
   },  
+  categoryHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+    textAlign: "center",
+    marginVertical: 10,
+    fontFamily: "Courier",
+  },
+  separator: {
+    height: 1,
+    marginVertical: 5,
+  },
 });
 
 export default TodoListScreen;
