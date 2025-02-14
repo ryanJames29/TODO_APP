@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     color: "black",
     marginBottom: 5,
     fontFamily: "Courier",
+    textDecorationLine: "underline"
   },
   text: { 
     fontSize: 18, 
