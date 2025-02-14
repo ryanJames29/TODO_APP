@@ -9,7 +9,7 @@ const ProfileScreen: React.FC = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
 
-  // Fetch the user's email for display
+  //Fetch the user's email for display
   useEffect(() => {
     const fetchUserEmail = async () => {
       const storedEmail = await AsyncStorage.getItem("loggedInUserEmail");
@@ -18,7 +18,7 @@ const ProfileScreen: React.FC = () => {
     fetchUserEmail();
   }, []);
 
-  // Fetch the user's name for display
+  //Fetch the user's name for display
   useEffect(() => {
     const fetchName = async () => {
       const storedName = await AsyncStorage.getItem("loggedInUser_name");
@@ -27,7 +27,7 @@ const ProfileScreen: React.FC = () => {
     fetchName();
   }, []);
 
-  // Handle Logout
+  //Handle Logout
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("loggedInUserEmail");
@@ -46,17 +46,15 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.title}>Profile</Text>
       </View>
 
-      {/* User Info (Left-aligned) */}
-      <View style={styles.infoContainer}>
+      {/* User Info Box positioned towards the upper half */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Name:</Text>
+        <Text style={styles.text}>{name}</Text>
+
         <Text style={styles.label}>Email:</Text>
         <Text style={styles.text}>{email}</Text>
 
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.text}>{name}</Text>
-      </View>
-
-      {/* Logout Button at the Bottom */}
-      <View style={styles.footer}>
+        {/* Logout Button - Adjusted to be very close to the bottom of the box */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
@@ -69,24 +67,36 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: "white",
-    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 50,
   },
   header: {
     alignItems: "center",
-    marginTop: 50,
+    marginBottom: 20,
   },
   title: { 
     fontSize: 35, 
     fontWeight: "bold",
-    fontFamily: "Courier"
+    fontFamily: "Courier",
   },
-  infoContainer: { 
-    marginTop: 50,
-    flex: 1, 
-    paddingHorizontal: 30,
+  infoBox: {
+    width: "85%",
+    backgroundColor: "#f5f5f5",
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    paddingBottom: 10,
   },
   label: { 
-    fontSize: 25, 
+    fontSize: 20, 
     fontWeight: "bold", 
     color: "black",
     marginBottom: 5,
@@ -95,13 +105,9 @@ const styles = StyleSheet.create({
   text: { 
     fontSize: 18, 
     color: "black",
-    marginBottom: 20,
+    marginBottom: 15,
     fontFamily: "Courier",
     fontWeight: "bold"
-  },
-  footer: {
-    alignItems: "center", 
-    paddingBottom: 100,
   },
   logoutButton: { 
     backgroundColor: "red",
@@ -112,6 +118,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
     width: "80%", 
     alignItems: "center",
+    marginTop: 25,
   },
   logoutButtonText: { 
     fontSize: 20, 

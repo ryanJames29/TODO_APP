@@ -136,6 +136,7 @@ const TodoListScreen: React.FC = () => {
     }
   };
 
+  //used to set the name for the user within the todo screen
   useEffect(() => {
     const fetchName = async () => {
       const storedName = await AsyncStorage.getItem("loggedInUser_name");
